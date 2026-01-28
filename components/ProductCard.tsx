@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Product } from '@/lib/supabase';
 
 type Props = {
@@ -36,7 +37,7 @@ function getStatusBadge(status: string) {
 
 export default function ProductCard({ product }: Props) {
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+    <Link href={`/products/${product.id}`} className="block bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="relative aspect-square">
         <Image
           src={product.image_url || 'https://picsum.photos/400/400'}
@@ -55,6 +56,6 @@ export default function ProductCard({ product }: Props) {
           <span>{formatTimeAgo(product.created_at)}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
