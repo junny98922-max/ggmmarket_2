@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, Product, Category } from '@/lib/supabase';
 import { getAdByIndex } from '@/lib/ads';
 import ProductCard from './ProductCard';
@@ -86,13 +86,12 @@ export default function ProductList() {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {products.map((product, index) => (
-            <>
-              {/* 4개 상품마다 광고 삽입 */}
+            <React.Fragment key={product.id}>
               {index > 0 && index % 4 === 0 && (
-                <AdBanner key={`ad-${index}`} ad={getAdByIndex(index / 4 - 1)} />
+                <AdBanner ad={getAdByIndex(index / 4 - 1)} />
               )}
-              <ProductCard key={product.id} product={product} />
-            </>
+              <ProductCard product={product} />
+            </React.Fragment>
           ))}
         </div>
       )}
