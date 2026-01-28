@@ -167,7 +167,7 @@ export default function ProductForm({ product, isEdit = false }: Props) {
           </label>
           <select
             value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value as '판매중' | '예약중' | '판매완료' })}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
           >
             <option value="판매중">판매중</option>
