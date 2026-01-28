@@ -25,3 +25,12 @@ export type Product = {
   updated_at: string;
   categories?: Category;
 };
+
+export type Review = {
+  id: string;
+  product_id: string;
+  author_name: string;
+  rating: number;
+  content: string;
+  created_at: string;
+};

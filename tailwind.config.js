@@ -7,8 +7,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#FF6F0F',
-        secondary: '#FF9F5F',
+        primary: '#0EA5E9',    // 바다 파란색 (Sky Blue)
+        secondary: '#06B6D4',  // 청록색 (Cyan)
+        accent: '#F59E0B',     // 따뜻한 황금색 (Warm Amber)
       },
     },
   },

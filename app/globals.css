@@ -4,12 +4,20 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
+  --background-start: 240, 249, 255;  /* sky-50 */
+  --background-end: 224, 247, 250;    /* cyan-50 */
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+  background: linear-gradient(
+    135deg,
+    rgb(var(--background-start)) 0%,
+    rgb(var(--background-end)) 50%,
+    rgb(254, 252, 232) 100%  /* amber-50 for warmth */
+  );
+  background-attachment: fixed;
+  min-height: 100vh;
 }
 
 /* 스크롤바 숨기기 (카테고리 필터용) */

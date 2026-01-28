@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { supabase, Product } from '@/lib/supabase';
+import Link from 'next/link';
+import { supabase, Product, Review } from '@/lib/supabase';
+import ReviewList from '@/components/ReviewList';
+import ReviewForm from '@/components/ReviewForm';
 
 function formatPrice(price: number): string {
   return price.toLocaleString('ko-KR') + '원';
@@ -33,7 +36,18 @@ export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const fetchReviews = async () => {
+    const { data } = await supabase
+      .from('reviews')
+      .select('*')
+      .eq('product_id', params.id)
+      .order('created_at', { ascending: false });
+    if (data) setReviews(data);
+  };
 
   useEffect(() => {
     async function fetchProduct() {
@@ -54,8 +68,26 @@ export default function ProductDetailPage() {
 
     if (params.id) {
       fetchProduct();
+      fetchReviews();
     }
   }, [params.id, router]);
+
+  const handleDelete = async () => {
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', params.id);
+
+    if (error) {
+      alert('삭제에 실패했습니다.');
+      return;
+    }
+    router.push('/');
+  };
+
+  const handleReviewAdded = () => {
+    fetchReviews();
+  };
 
   if (loading) {
     return (
@@ -136,13 +168,64 @@ export default function ProductDetailPage() {
           </p>
         </div>
 
-        {/* 채팅 버튼 */}
-        <button
-          className="w-full py-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-          disabled={product.status === '판매완료'}
-        >
-          {product.status === '판매완료' ? '판매완료된 상품입니다' : '채팅으로 거래하기'}
-        </button>
+        {/* 버튼들 */}
+        <div className="space-y-3">
+          <button
+            className="w-full py-4 bg-primary text-white font-semibold rounded-lg hover:bg-secondary transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled={product.status === '판매완료'}
+          >
+            {product.status === '판매완료' ? '판매완료된 상품입니다' : '채팅으로 거래하기'}
+          </button>
+
+          <div className="flex gap-3">
+            <Link
+              href={`/products/${product.id}/edit`}
+              className="flex-1 py-3 border border-primary text-primary text-center rounded-lg hover:bg-primary hover:text-white transition-colors font-medium"
+            >
+              수정하기
+            </Link>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="flex-1 py-3 border border-red-500 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors font-medium"
+            >
+              삭제하기
+            </button>
+          </div>
+        </div>
+
+        {/* 삭제 확인 모달 */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-6 max-w-sm mx-4">
+              <h3 className="text-lg font-bold mb-2">상품 삭제</h3>
+              <p className="text-gray-600 mb-6">정말로 이 상품을 삭제하시겠습니까?</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 py-3 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  삭제
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 구분선 */}
+        <hr className="border-gray-200 my-8" />
+
+        {/* 리뷰 섹션 */}
+        <div className="space-y-6">
+          <h2 className="text-xl font-bold text-gray-900">상품 후기</h2>
+          <ReviewForm productId={product.id} onReviewAdded={handleReviewAdded} />
+          <ReviewList reviews={reviews} />
+        </div>
       </div>
     </div>
   );
